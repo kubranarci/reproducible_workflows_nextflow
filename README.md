@@ -54,7 +54,8 @@ To follow the workshop on your computer, you will need the following software an
 - Bash
 - [Java11](https://www.oracle.com/java/technologies/downloads/) (or later, up to 18)
 - [Nextflow](https://www.nextflow.io/docs/latest/getstarted.html#installation)
-- [nf-core](https://nf-co.re/) - [nf-core tools on Github](https://github.com/nf-core/tools)
+- [nf-core](https://nf-co.re/)
+- [nf-core tools on Github](https://github.com/nf-core/tools)
 - [Docker](https://www.oracle.com/java/technologies/downloads/)
 - [GitHub CLI](https://cli.github.com/)
 - [Data](https://github.com/GHGA-Training/gcb_ngs_harmonisation_workshop/tree/main/data) 
@@ -975,9 +976,14 @@ When you complete the commit, you can monitor the test under _Actions_ bar at th
 
 > **FINAL NOTE**: https://github.com/kubranarci/nf-core-mydemo/tree/dev includes a run-ready pipeline with a results directory. If you haven't managed to complete your workflow just yet, you can have a look. 
 
+#### Would you like to give a feed back on the workshop?
+
+[feedback](https://www.mentimeter.com/app/presentation/n/al3tywn1xdrpm2jbyf12wqfjtuxpwpzg/edit)
+
+
 ### Are you looking for your next challange? 
 
-If you are feeling confortable enough working with template pipeline, why not to create your own pipeline using a (nf-core pipeline)[https://nf-co.re/docs/nf-core-tools/pipelines/create] template?
+If you are feeling confortable enough working with template pipeline, why not to create your own pipeline using a [nf-core pipeline](https://nf-co.re/docs/nf-core-tools/pipelines/create) template?
 
 In this small exercise you will be creating a simple workflow to subset, sort and index given alignment files.
 
