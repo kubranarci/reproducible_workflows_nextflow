@@ -346,8 +346,7 @@ It is a common practice to work on _dev_ or _master_ branches, you should not to
 - Since the template created a full ready pipeline, we can actually run it! It has *FASTQC* and *MultiQC* modules installed with a small test config which contains small sets of reads.
 
 ```bash
-cd ../
-nextflow run nf-core-mydemo/ -profile test,docker --outdir test_results
+nextflow run main.nf -profile test,docker --outdir test_results
 ```
 
 - Check test_results/ output directory to study fastqc outputs. 
@@ -479,10 +478,11 @@ workflow MYDEMO {
 ...
 
 }
+```
 
 Now, 
 
-- and lets have a look on ch_fasta, type this to mydemo.nf and make a test run.
+- lets have a look on ch_fasta, type this to mydemo.nf and make a test run.
 
 ```nextflow
 
@@ -493,7 +493,7 @@ Run the pipeline:
 
 ```bash
 cd ../
-nextflow run nf-core-mydemo/ -profile test,docker --outdir test_results --fasta "data/ggal_1_48850000_49020000.Ggal71.500bpflank.fa"
+nextflow run main.nf -profile test,docker --outdir test_results --fasta "data/ggal_1_48850000_49020000.Ggal71.500bpflank.fa"
 ```
 
 > _*Note*: What is really cool and helpful to use the **-resume** tag to resume previously finished jobs! Moreover, don't forget to check out .nextflow.log files in case of an error. All of the runs will be saved into _work_ directory._
@@ -516,7 +516,7 @@ The output index directory will be saved into ch_index channel for our further u
 
 Run the pipeline to see the results:
 ```
-nextflow run nf-core-mydemo/ -profile test,docker --outdir test_results --fasta "data/ggal_1_48850000_49020000.Ggal71.500bpflank.fa" -resume
+nextflow run main.nf -profile test,docker --outdir test_results --fasta "data/ggal_1_48850000_49020000.Ggal71.500bpflank.fa" -resume
 ```
 
 > **Exercise:** Check BWA_INDEX output directory.   
@@ -552,7 +552,7 @@ When we do test runs, we were using test.config. That file is readily available 
     Defines input files and everything required to run a fast and simple pipeline test.
 
     Use as follows:
-        nextflow run nf-core/nf-core-mydemo -profile mytest,<docker/singularity> --outdir <OUTDIR>
+        nextflow run main.nf -profile mytest,<docker/singularity> --outdir <OUTDIR>
 
 ----------------------------------------------------------------------------------------
 */
@@ -600,7 +600,7 @@ BWA_MEM module requires fastq reads which were already provided with ch_samplesh
 Run the pipeline to see the results:
 
 ```bash
-nextflow run nf-core-mydemo/ -profile docker -c conf/mytest.config --outdir test_results -resume
+nextflow run main.nf -profile docker -c conf/mytest.config --outdir test_results -resume
 ```
 
 > Warning: Be awaire that we are no longer using the test profile and switched into our own config. To be able to run it through profile, we should add it as profile in nextflow.config:
@@ -804,7 +804,7 @@ It is actually that easy to create such a functional workflow!
 Here, we will try to run our workflow using the config file we created (mytest), and input file we prepared (mysamplesheet.csv) and docker environment. But you can also run it with singularity. You can also define another output directory else than _test_results_. 
 
 ```bash
-nextflow run nf-core-mydemo/ -profile mytest,docker --outdir test_results -resume
+nextflow run main.nf -profile mytest,docker --outdir test_results -resume
 
 ```
 
