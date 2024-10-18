@@ -1,14 +1,13 @@
 ## **Standardizing and harmonizing NGS analysis workflows**
 
-Materials for NGS Harmonization Workshop at GCB 2024
 
-It is planned to be 3 hours of an overview of standardization and harmonizing NGS analysis strategies in GHGA. We will explore how FAIR principles enable the standardization and harmonization of nf-core-based NGS analysis workflows within GHGA. We will  demonstrate the adaptability of nf-core workflows and discuss the importance of standardization of workflows. Finally, we will show how to make workflows scalable, robust, and automated using a small subset of a public dataset. 
+It is planned to be 3 hours of an overview of standardization and harmonizing NGS analysis strategies. We will explore how FAIR principles enable the standardization and harmonization of nf-core-based NGS analysis workflows. We will  demonstrate the adaptability of nf-core workflows and discuss the importance of standardization of workflows. Finally, we will show how to make workflows scalable, robust, and automated using a small subset of a public dataset. 
 
 ### Preliminary Schedule
 
 |Time|Topic|
 |:---|:---|
-|9:00am  - 9:10am| Introduction to the tutorial: What is GHGA? What are our workflow objectives? What is FAIR data|
+|9:00am  - 9:10am| What is FAIR data|
 |9:10am  - 9:30am| Reproducibility, adaptability, and portability of Workflows|
 |9:30am  - 10:15am| Hands-on part 1: Docker, Github, introduction to nextflow and nf-core tools |
 |10:15am - 10:30am| Break|
@@ -66,16 +65,16 @@ To follow the workshop on your computer, you will need the following software an
 
 The most common way of providing stable versions for software is through git systems. Github, gitlab or bitbucket are all valuable services in software development. They provide code hosting/storage platform for version control and collaboration. It lets you and others work on the same project from anywhere. Using git systems one can create different branches (or copies) of the stable working version dependent or independent of one another. 
 
-GitHub is one of the most commonly used platform for collaborative software development and version control using git. We will be using the following repositories through this workshop. If you want, you can fork [GHGA-Training/gcb_ngs_harmonisation_workshop](https://github.com/GHGA-Training/gcb_ngs_harmonisation_workshop) or follow it from the original documentation.
+GitHub is one of the most commonly used platform for collaborative software development and version control using git. We will be using the following repositories through this workshop. If you want, you can fork [GHGA-Training/gcb_ngs_harmonisation_workshop](https://github.com/kubranarci/reproducible_workflows_nextflow) or follow it from the original documentation.
 
 Go to the websites and fork the following repositories:
-- https://github.com/GHGA-Training/gcb_ngs_harmonisation_workshop
+- (https://github.com/kubranarci/reproducible_workflows_nextflow) 
 
 or
 
 ```bash
 gh auth login
-gh repo fork https://github.com/GHGA-Training/gcb_ngs_harmonisation_workshop.git --clone
+gh repo fork https://github.com/kubranarci/reproducible_workflows_nextflow.git --clone
 ```
 
 Whenever you fork the page, you can take any actions on that as you wish! 
