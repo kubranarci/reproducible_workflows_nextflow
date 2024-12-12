@@ -322,7 +322,7 @@ We will play more with nf-core modules in the second part.
 - We will use nf-core template to create our first nextflow pipeline. Run the create command:
 
 ```bash
-nf-core create
+nf-core pipelines create
 ```
 
 I used "mydemo" to name my pipeline. nf-core automatically adds nf-core prefix if you accept default settings. You can follow the instructions and interactive prompts.
@@ -338,6 +338,7 @@ cd nf-core-mydemo
 ```bash
 git status
 git branch
+git checkout dev
 ```
 
 It is a common practice to work on _dev_ or _master_ branches, you should not touch _TEMPLATE_. nf-core has a automated template synchronization and it works through with template branch.
@@ -359,7 +360,6 @@ Lets start building our own pipeline now:
 - We will perform _bwa-mem_ alignment, which requires indexed fasta genome from _bwa-index_. Thus we need bwa-mem and bwa-index modules. Luckily, nf-core modules library provides bwa modules readily available. Lets install bwa/mem and bwa/index modules:
 
 ```bash
-cd nf-core-mydemo
 nf-core modules install bwa/mem
 nf-core modules install bwa/index
 ```
@@ -444,40 +444,10 @@ include { BWA_INDEX              } from '../modules/nf-core/bwa/index/main'
 
 - To perform alignment using _bwa-mem,_ we need the reference fasta file to be indexed. 
 
->_*Note*: The template includes igenome.config template ready to use. Therefore, we can directly use one of the provided fasta files readily. We will use _bwa_index_ tool to index fasta file. [IGenomes](https://emea.support.illumina.com/sequencing/sequencing_software/igenome.html) is a source providing collections of references and annotations supported by AWS. igenome.config includes parameters for the available sources for the pipeline._ 
+>_*Note*: The template includes igenome.config template ready to use. Therefore, we can directly use one of the provided fasta files readily. To be able to use fasta files --genoem parameter has to be defined. [IGenomes](https://emea.support.illumina.com/sequencing/sequencing_software/igenome.html) is a source providing collections of references and annotations supported by AWS. igenome.config includes parameters for the available sources for the pipeline._ 
 
-The template comes ready to use fasta channel. Please take a look into main.nf file. There _getGenomeAttribute_ function enables initiation of the channel from parameters.
 
-- Now, cut the following part in main.nf and put it below _nextflow.enable.dsl = 2_ line. 
-
-!! This part is only necessary due to a current bug in the template!!
-
-```nextflow
-nextflow.enable.dsl = 2
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_variantbenchmarking_pipeline'
-params.fasta = getGenomeAttribute('fasta')
-
-```
-
-- Lets create _fasta_ now.  Open workflows/mydemo.nf and paste the following lines:
-
-```nextflow
-
-workflow MYDEMO {
-
-    take: 
-        samplesheet // channel: samplesheet read in from --input
-
-    main:
-...
-    // check mandatory parameters
-    println(params.fasta)
-    ch_fasta       = Channel.fromPath(params.fasta, checkIfExists: true).map{ it -> tuple([id: it[0].getSimpleName()], it) }.collect()
-
-...
-
-}
-```
+params.fasta is already defined in nextflow.config file.
 
 Now, 
 
@@ -488,7 +458,7 @@ Now,
 ch_fasta.view()
 ```
 
-Run the pipeline:
+Run the pipeline using the fasta reference given in data directory:
 
 ```bash
 cd ../
@@ -569,7 +539,6 @@ params {
     input  = 'assets/mysamplesheet.csv' 
 
     // Genome references
-    //genome = 'hg38'
     fasta = "data/ggal_1_48850000_49020000.Ggal71.500bpflank.fa"
 }
 ```
@@ -589,18 +558,30 @@ BWA_MEM module requires fastq reads which were already provided with ch_samplesh
     BWA_MEM(
         ch_samplesheet,
         ch_index,
-        fasta,
+        ch_fasta,
         "true"
     )
     ch_bam = BWA_MEM.out.bam
     ch_versions = ch_versions.mix(BWA_MEM.out.versions)
 ```
 
-Run the pipeline to see the results:
+Different tools might have different and sometimes big memory/cpu requirement exceeding your infratructural limits. Optimization of those might be rquired. BWA_MEM is one of the tools requires high memory whe running normal size of samples, but since we are using only a small subset now, lets rearrange the resources for BWA_MEM:
+
+Add new parameters to conf/base.config file:
+```nextflow
+    withName:BWA_MEM{
+        cpus   = { 2     * task.attempt }
+        memory = { 12.GB * task.attempt }
+        time   = { 4.h   * task.attempt }
+    }
+```
+
+Now, run the pipeline to see the results:
 
 ```bash
 nextflow run main.nf -profile docker -c conf/mytest.config --outdir test_results -resume
 ```
+
 
 > Warning: Be awaire that we are no longer using the test profile and switched into our own config. To be able to run it through profile, we should add it as profile in nextflow.config:
 
@@ -614,97 +595,11 @@ Final task will be calling variants using the bam files generated with BWA_MEM. 
 
 > Tip: If you think this task is too much for you, you can also use readly available BCFTOOLS_MPILEUP module from nf-core! Just follow the same steps that we did for BWA_INDEX and BWA_MEM!_
 
-
-- A draft BCFTOOLS_MPILEUP module will look like this: We will need to define input and output files together with bcftools commands that will process variant calling. 
-
-```nextflow
-process BCFTOOLS_MPILEUP {
-    tag "$meta.id"
-    label 'process_medium'
-
-    conda ""
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'singularity_container':
-        'docker_container' }"
-
-    input:
-    INPUT_FILES
-
-    output:
-    OUTPUT_FILES
-    path  "versions.yml"                 , emit: versions
-
-    when:
-    task.ext.when == null || task.ext.when
-
-    script:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
-    """
-    CMD
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        CMD_VERSION
-    END_VERSIONS
-    """
-}
-
 ```
 Open bcftools_mpileup.nf and place under modules/local folder, and copy the above draft BCFTOOLS_MPILEUP module into open bcftools_mpileup.nf. We will need to include _INPUT_FILES_, _OUTPUT_FILES_, _CMD_ and _CMD_VERSION_ sections in order to make this module compleate as follows: 
 
-Now, we need to construct the simple CMD for variant calling: 
 
-```nextflow
-    bcftools \\
-        mpileup \\
-        --fasta-ref $fasta \\
-        -Oz \\
-        $bam \\
-        | bcftools call --output-type v -mv -Oz \\
-        | bcftools view --output-file ${prefix}.vcf.gz --output-type z
-
-    tabix -p vcf -f ${prefix}.vcf.gz
-    bcftools stats ${prefix}.vcf.gz > ${prefix}.bcftools_stats.txt
-
-```
-_bctools mpileup_ will produce a mpileup file including genotypes, then we will use _bcftools call_ to actually call variant sites and save as gzipped vcf file. As a plus, we will use _bcftools stats_ to examine the number of variants. 
-
-We will need the alignment bam file and reference fasta file to run _bcftools mpileup_ and this argument will produce an indexed vcf.gz file and a statistic file in txt format. Therefore, input and output definitions will be: 
-
-```nextflow
-    input:
-    tuple val(meta), path(bam)
-    tuple val(meta2), path (fasta)
-
-    output:
-    tuple val(meta), path("*vcf.gz")     , emit: vcf
-    tuple val(meta), path("*vcf.gz.tbi") , emit: tbi
-    tuple val(meta), path("*stats.txt")  , emit: stats
-    path  "versions.yml"                 , emit: versions
-
-```
-
- We will also emit versions file to keep track of bcftool versioning.
-
-
-```nextflow
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        bcftools: \$(bcftools --version 2>&1 | head -n1 | sed 's/^.*bcftools //; s/ .*\$//')
-    END_VERSIONS
-```
-
- We can add either our docker container (created in the 3rt step) or search for the proper bcftool version on[ biocontainers registry](https://quay.io/repository/biocontainers/bcftools?tab=tags). 
-
-```nextflow
-    conda "bioconda::bcftools=1.17"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bcftools:1.17--haef29d1_0':
-        'biocontainers/bcftools:1.17--haef29d1_0' }"
-```
-
- The final module should like this:
+The final module should like this:
 
 
 ```nextflow
