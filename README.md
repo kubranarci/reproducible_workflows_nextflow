@@ -3,18 +3,6 @@
 
 It is planned to be 3 hours of an overview of standardization and harmonizing NGS analysis strategies. We will explore how FAIR principles enable the standardization and harmonization of nf-core-based NGS analysis workflows. We will  demonstrate the adaptability of nf-core workflows and discuss the importance of standardization of workflows. Finally, we will show how to make workflows scalable, robust, and automated using a small subset of a public dataset. 
 
-### Preliminary Schedule
-
-|Time|Topic|
-|:---|:---|
-|9:00am  - 9:10am| What is FAIR data|
-|9:10am  - 9:30am| Reproducibility, adaptability, and portability of Workflows|
-|9:30am  - 10:15am| Hands-on part 1: Docker, Github, introduction to nextflow and nf-core tools |
-|10:15am - 10:30am| Break|
-|10:30am - 11:30am| Hands-on part 2: Setting up a simple nextflow workflow using nf-core tools|
-|11:30am - 11:50am| How to keep reproducibility 
-|11:50am - 12:00am| Summary 
-
 
 ### Learning Objectives for Tutorial
 
