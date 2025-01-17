@@ -4,6 +4,7 @@ tasks:
     command: |
       pre-commit install --install-hooks
       nextflow self-update
+      pip install --upgrade --force-reinstall nf-core==3.0.2
 
 vscode:
   extensions: # based on nf-core.nf-core-extensionpack
