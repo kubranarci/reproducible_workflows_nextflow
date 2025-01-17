@@ -284,8 +284,9 @@ Running nf-core pipelines are very easy! Most of the resources that nf-core uses
 
 ```bash
 # Launch the RNAseq pipeline
-nextflow run nf-core/rnaseq -profile test,docker
+nextflow run nf-core/rnaseq -profile test,docker --outdir test
 ```
+> _*Note*: Running this commend might take ~10min. 
 
 **nf-core** also provides ready to use atomic processes for pipelines which are called as _modules_. Their modules library is very wide, they have **1273** modules.
 
@@ -309,6 +310,8 @@ We will play more with nf-core modules in the second part.
 
 - We will use nf-core template to create our first nextflow pipeline. Run the create command:
 
+> _*Attention*: nf-core templates (with nf-core tools) are regulary being updated and different versions might show slight difference!
+ 
 ```bash
 nf-core pipelines create
 ```
@@ -434,8 +437,23 @@ include { BWA_INDEX              } from '../modules/nf-core/bwa/index/main'
 
 >_*Note*: The template includes igenome.config template ready to use. Therefore, we can directly use one of the provided fasta files readily. To be able to use fasta files --genoem parameter has to be defined. [IGenomes](https://emea.support.illumina.com/sequencing/sequencing_software/igenome.html) is a source providing collections of references and annotations supported by AWS. igenome.config includes parameters for the available sources for the pipeline._ 
 
+params.fasta is already defined in nextflow.config file, so we dont neeed to add that to parameters.
 
-params.fasta is already defined in nextflow.config file.
+
+- Lets create _fasta_ channel now.  Open workflows/mydemo.nf and paste the following lines:
+  
+```nextflow
+workflow MYDEMO {
+    take: 
+        samplesheet // channel: samplesheet read in from --input
+    main:
+...
+    // check mandatory parameters
+    println(params.fasta)
+    ch_fasta       = Channel.fromPath(params.fasta, checkIfExists: true).map{ it -> tuple([id: it[0].getSimpleName()], it) }.collect()
+...
+}
+```
 
 Now, 
 
@@ -555,13 +573,15 @@ BWA_MEM module requires fastq reads which were already provided with ch_samplesh
 
 Different tools might have different and sometimes big memory/cpu requirement exceeding your infratructural limits. Optimization of those might be rquired. BWA_MEM is one of the tools requires high memory whe running normal size of samples, but since we are using only a small subset now, lets rearrange the resources for BWA_MEM:
 
-Add new parameters to conf/base.config file:
+Add new parameters to conf/mytest.config file:
 ```nextflow
-    withName:BWA_MEM{
-        cpus   = { 2     * task.attempt }
-        memory = { 12.GB * task.attempt }
-        time   = { 4.h   * task.attempt }
-    }
+process {
+    resourceLimits = [
+        cpus: 4,
+        memory: '15.GB',
+        time: '1.h'
+    ]
+}
 ```
 
 Now, run the pipeline to see the results:
